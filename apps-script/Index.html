@@ -1371,10 +1371,14 @@ button.tag { transition: transform .1s ease, box-shadow .12s ease; }
     const ctx = cv.getContext('2d');
     ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = '#000000'; ctx.textBaseline = 'middle';
+    // Garis pemisah dibuat tebal dengan putus-putus panjang: aplikasi printer thermal sering
+    // mengubah ukuran gambar lalu mengubahnya jadi titik hitam-putih, dan garis tipis bisa hilang sebagian.
+    const rt = Math.max(3, Math.round(width / 120)), dl = rt * 4, dg = rt * 2;
+    const dn = Math.floor((inner + dg) / (dl + dg)), dx0 = mx + Math.round((inner - (dn * dl + (dn - 1) * dg)) / 2);
     let y = 0;
     ops.forEach((o) => {
       const ym = y + o.h / 2;
-      if (o.rule) { for (let x = mx; x < width - mx; x += 10) ctx.fillRect(x, Math.round(ym) - 1, Math.min(6, width - mx - x), 2); }
+      if (o.rule) { for (let i = 0; i < dn; i++) ctx.fillRect(dx0 + i * (dl + dg), Math.round(ym - rt / 2), dl, rt); }
       else if (o.s != null) {
         ctx.font = o.f; ctx.textAlign = o.ctr ? 'center' : 'left';
         ctx.fillText(o.s, o.ctr ? width / 2 : mx, ym, inner);
